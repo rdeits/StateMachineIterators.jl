@@ -1,5 +1,7 @@
 using StateMachineIterators
 using Base.Test
+import Iterators: chain
+import IJulia
 
 # Test non-iterator interface:
 
@@ -17,13 +19,15 @@ let
     state = initial(machine)
     while state != final(machine)
         push!(values, x)
-        state = next_state(machine, state, x)
+        state = nextstate(machine, state, x)
         x = behaviors[state](x)
     end
 
     @test all(values .== [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1])
 
 end
+
+# Test iterator interface:
 
 let
     machine = StateMachine(:going_up, :final,
@@ -88,3 +92,26 @@ let
         (2, 2),
         (1, 3)])
 end
+
+let
+    machine = StateMachine(:going_up, :final,
+       [(:going_up, x -> x >= 5, :going_down),
+        (:going_down, x -> x <= 1, :final)])
+
+    behaviors = Dict(:going_up => x -> x + 1,
+                     :going_down => x -> x - 1,
+                     :final => x -> x)
+
+    values = []
+
+    x = 1
+    for state in chain(repeated(StateMachineIterator(machine, () -> x), 2)...)
+        push!(values, x)
+        x = behaviors[state](x)
+    end
+    @test all(values .== [1, 2, 3, 4, 5, 4, 3, 2, 1, 1, 2, 3, 4, 5, 4, 3, 2, 1])
+end
+
+jupyter = IJulia.jupyter
+notebook = "../examples/state_machines.ipynb"
+run(`$jupyter nbconvert --to notebook --execute $notebook --output $notebook`)
