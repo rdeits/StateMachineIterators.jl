@@ -114,4 +114,5 @@ end
 
 jupyter = IJulia.jupyter
 notebook = "../examples/state_machines.ipynb"
-run(`$jupyter nbconvert --to notebook --execute $notebook --output $notebook`)
+kernel = "julia-$(VERSION.major).$(VERSION.minor)"
+run(`$jupyter nbconvert --to notebook --execute $notebook --output $notebook --ExecutePreprocessor.kernel_name="$(kernel)"`)
