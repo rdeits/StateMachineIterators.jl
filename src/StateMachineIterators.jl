@@ -46,7 +46,7 @@ function StateMachine(initial::Symbol, final::Symbol, transitions::Vector{Tuple{
     machine
 end
 
-show(io::IO, machine::StateMachine) = println("StateMachine with states: $(collect(keys(machine.states)))
+show(io::IO, machine::StateMachine) = write(io, "StateMachine with states: $(collect(keys(machine.states)))
     initial state: $(machine.initial.name)
     final state: $(machine.final.name)")
 
